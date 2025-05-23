@@ -61,7 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Generate PDF
     const pdf = await page.pdf({
-      format: 'Letter',
+      format: 'letter',
       printBackground: true,
       margin: {
         top: '0.5in',
