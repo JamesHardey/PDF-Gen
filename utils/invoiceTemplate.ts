@@ -1,6 +1,13 @@
 import { formatValue } from "./formatValue";
 import { format } from "date-fns";
 
+// Safe date formatting function
+const safeFormat = (date: any, formatStr: string = "MM/dd/yyyy") => {
+  if (!date) return '';
+  const d = new Date(date);
+  return isNaN(d.getTime()) ? '' : format(d, formatStr);
+};
+
 export const invoiceTemplate = (
   invoiceNum: string,
   customer: any,
@@ -130,7 +137,7 @@ export const invoiceTemplate = (
       </div>
     </div>`;
 
-  // Invoice Details section generation
+  // Invoice Details section generation with safe date formatting
   const invoiceDetails = `
     <div class="invoice-details-section">
       <div class="bill-to-section">
@@ -148,17 +155,17 @@ export const invoiceTemplate = (
           <div class="info-value">#${invoiceNum}</div>
         </div>
         
-        ${invoiceForm?.createdDate ? `
+        ${invoiceForm?.createdDate && safeFormat(invoiceForm.createdDate) ? `
           <div class="invoice-info-row">
             <div class="info-label">Issued Date</div>
-            <div class="info-value">${format(invoiceForm?.createdDate, "MM/dd/yyyy")}</div>
+            <div class="info-value">${safeFormat(invoiceForm.createdDate)}</div>
           </div>
         ` : ''}
         
-        ${invoiceForm?.dueDate && pdfTitle !== "Estimate" ? `
+        ${invoiceForm?.dueDate && pdfTitle !== "Estimate" && safeFormat(invoiceForm.dueDate) ? `
           <div class="invoice-info-row">
             <div class="info-label">Due Date</div>
-            <div class="info-value">${format(invoiceForm?.dueDate, "MM/dd/yyyy")}</div>
+            <div class="info-value">${safeFormat(invoiceForm.dueDate)}</div>
           </div>
         ` : ''}
       </div>
@@ -486,13 +493,13 @@ export const invoiceTemplate = (
       <!-- Invoice Table -->
       ${invoiceTable}
       
-      <!-- Signature Section -->
+      <!-- Signature Section with safe date formatting -->
       ${signature ? `
         <div class="signature-section">
           <div class="signature-container">
             <img class="signature-image" src="${signature}" alt="Signature" style="height: 75px; width: 93px; object-fit: contain;" />
             <div class="signature-line"></div>
-            <div class="signature-date">${format(new Date(), "MM/dd/yyyy")}</div>
+            <div class="signature-date">${safeFormat(new Date())}</div>
           </div>
         </div>
       ` : ''}
@@ -504,4 +511,4 @@ export const invoiceTemplate = (
   </body>
   </html>
   `;
-}; 
+};
