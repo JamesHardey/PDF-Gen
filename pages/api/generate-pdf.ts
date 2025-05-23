@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import puppeteer from 'puppeteer-core';
-import chrome from 'chrome-aws-lambda';
+import htmlPdf from 'html-pdf-node';
 import { invoiceTemplate } from '../../utils/invoiceTemplate';
 import { format } from 'date-fns';
 
@@ -27,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       displayPaymentInstruction
     } = req.body;
 
-    // Generate HTML content using the template
+    // Generate HTML content using the existing template
     const htmlContent = invoiceTemplate(
       invoiceNum,
       customer,
@@ -45,61 +44,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       displayPaymentInstruction
     );
 
-    // Configure browser launch options
-    // const options = process.env.AWS_LAMBDA_FUNCTION_VERSION
-    //   ? {
-    //       args: chrome.args,
-    //       defaultViewport: chrome.defaultViewport,
-    //       executablePath: await chrome.executablePath,
-    //       headless: chrome.headless,
-    //       ignoreHTTPSErrors: true,
-    //     }
-    //   : {
-    //       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    //       executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-    //       headless: true,
-    //     };
-
+    // PDF options
     const options = {
-      args: chrome.args,
-      defaultViewport: chrome.defaultViewport,
-      executablePath: await chrome.executablePath,
-      headless: chrome.headless,
-      ignoreHTTPSErrors: true,
-    };
-    
-    // Launch browser
-    const browser = await puppeteer.launch(options);
-
-    // Create new page
-    const page = await browser.newPage();
-
-    // Set content
-    await page.setContent(htmlContent, {
-      waitUntil: 'networkidle0',
-    });
-
-    // Generate PDF
-    const pdf = await page.pdf({
-      format: 'letter',
-      printBackground: true,
+      format: 'Letter',
       margin: {
         top: '0.5in',
         right: '0.5in',
         bottom: '0.5in',
-        left: '0.5in',
+        left: '0.5in'
       },
-    });
+      printBackground: true,
+      preferCSSPageSize: true
+    };
 
-    // Close browser
-    await browser.close();
+    // Generate PDF
+    const file = await htmlPdf.generatePdf({ content: htmlContent }, options);
 
     // Set response headers
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=invoice-${invoiceNum}.pdf`);
 
     // Send PDF
-    res.send(pdf);
+    res.send(file);
   } catch (error: any) {
     console.error('Error generating PDF:', error);
     res.status(500).json({ message: 'Error generating PDF', error: error.message });
