@@ -5,7 +5,10 @@ declare module 'puppeteer-core' {
   }
 
   export interface Page {
-    setContent(html: string, options?: { waitUntil?: string | string[] }): Promise<void>;
+    setContent(html: string, options?: { 
+      waitUntil?: string | string[];
+      timeout?: number;
+    }): Promise<void>;
     pdf(options?: PDFOptions): Promise<Buffer>;
   }
 
@@ -18,6 +21,7 @@ declare module 'puppeteer-core' {
       bottom?: string;
       left?: string;
     };
+    timeout?: number;
   }
 
   export interface LaunchOptions {
@@ -27,7 +31,7 @@ declare module 'puppeteer-core' {
       height: number;
     };
     executablePath?: string;
-    headless?: boolean;
+    headless?: boolean | 'new' | 'shell';
     ignoreHTTPSErrors?: boolean;
   }
 
