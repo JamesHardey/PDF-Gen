@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import puppeteer from 'puppeteer-core';
 import chrome from 'chrome-aws-lambda';
 import { invoiceTemplate } from '../../utils/invoiceTemplate';
+import { format } from 'date-fns';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -84,4 +85,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.error('Error generating PDF:', error);
     res.status(500).json({ message: 'Error generating PDF', error: error.message });
   }
-} 
+}
+
+const safeFormat = (date: any) => {
+  const d = new Date(date);
+  return isNaN(d.getTime()) ? '' : format(d, "MM/dd/yyyy");
+};
