@@ -46,13 +46,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     );
 
     // Configure browser launch options
-    const options = {
+    // const options = process.env.AWS_LAMBDA_FUNCTION_VERSION
+    //   ? {
+    //       args: [...chrome.args, '--hide-scrollbars', '--disable-web-security'],
+    //       defaultViewport: chrome.defaultViewport,
+    //       executablePath: await chrome.executablePath,
+    //       headless: true,
+    //       ignoreHTTPSErrors: true,
+    //     }
+    //   : {
+    //       args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    //       executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    //       headless: true,
+    //     };
+
+    const options =  {
       args: [...chrome.args, '--hide-scrollbars', '--disable-web-security'],
       defaultViewport: chrome.defaultViewport,
       executablePath: await chrome.executablePath,
       headless: true,
       ignoreHTTPSErrors: true,
-    };
+    }
+      
 
     // Launch browser
     const browser = await puppeteer.launch(options);
