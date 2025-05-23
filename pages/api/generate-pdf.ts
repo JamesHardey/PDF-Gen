@@ -45,12 +45,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       displayPaymentInstruction
     );
 
+    // Configure browser launch options
+    const options = process.env.AWS_LAMBDA_FUNCTION_VERSION
+      ? {
+          args: chrome.args,
+          executablePath: await chrome.executablePath,
+          headless: true,
+        }
+      : {
+          args: [],
+          executablePath: process.platform === 'win32'
+            ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+            : process.platform === 'linux'
+            ? '/usr/bin/google-chrome'
+            : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+          headless: true,
+        };
+
     // Launch browser
-    const browser = await puppeteer.launch({
-      args: chrome.args,
-      executablePath: await chrome.executablePath,
-      headless: true,
-    });
+    const browser = await puppeteer.launch(options);
 
     // Create new page
     const page = await browser.newPage();
