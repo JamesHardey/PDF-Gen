@@ -48,10 +48,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Configure browser launch options
     // const options = process.env.AWS_LAMBDA_FUNCTION_VERSION
     //   ? {
-    //       args: [...chrome.args, '--hide-scrollbars', '--disable-web-security'],
+    //       args: chrome.args,
     //       defaultViewport: chrome.defaultViewport,
     //       executablePath: await chrome.executablePath,
-    //       headless: true,
+    //       headless: chrome.headless,
     //       ignoreHTTPSErrors: true,
     //     }
     //   : {
@@ -60,15 +60,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     //       headless: true,
     //     };
 
-    const options =  {
-      args: [...chrome.args, '--hide-scrollbars', '--disable-web-security'],
+    const options = {
+      args: chrome.args,
       defaultViewport: chrome.defaultViewport,
       executablePath: await chrome.executablePath,
-      headless: true,
+      headless: chrome.headless,
       ignoreHTTPSErrors: true,
-    }
-      
-
+    };
+    
     // Launch browser
     const browser = await puppeteer.launch(options);
 
